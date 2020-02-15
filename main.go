@@ -21,8 +21,9 @@ func Index(week int) int {
 func handler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request){
 		_, week := time.Now().ISOWeek()
-		i := Index(week)
-		fmt.Fprintf(w, "today is week %d and scheduled week %d", week, Schedule[i])
+		sched := Schedule[Index(week)]
+		date := time.Now().Format("2006-01-02 15:04:05")
+		fmt.Fprintf(w, "date:%s\nweek:%d\nschedule:%d", date,  week, sched)
 	}
 }
 

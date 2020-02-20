@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"time"
+	"strconv"
 
 	"github.com/karlpokus/ratelmt"
 	"github.com/karlpokus/srv"
@@ -18,12 +19,27 @@ func Index(week int) int {
 	return week % len(Schedule)
 }
 
+// the handler returns the schedule for the current week or
+// any week if passed by queryparam
 func handler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request){
-		_, week := time.Now().ISOWeek()
-		sched := Schedule[Index(week)]
+		var weekInt int
+		var weekString string
+		var err error
+		weekString = r.URL.Query().Get("w")
+		if weekString != "" {
+			weekInt, err = strconv.Atoi(weekString)
+			if err != nil {
+				http.Error(w, "queryparam w is not a valid int", 400)
+				return
+			}
+		}
+		if weekString == "" {
+			_, weekInt = time.Now().ISOWeek()
+		}
+		sched := Schedule[Index(weekInt)]
 		date := time.Now().Format("2006-01-02 15:04:05")
-		fmt.Fprintf(w, "date:%s\nweek:%d\nschedule:%d", date,  week, sched)
+		fmt.Fprintf(w, "today is:%s\nweek:%d\nschedule:%d", date,  weekInt, sched)
 	}
 }
 

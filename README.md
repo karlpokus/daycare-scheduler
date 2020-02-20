@@ -8,6 +8,7 @@ $ ./build.sh && ./run.sh
 
 # todo
 - [ ] tls
+- [x] week query param
 
 # license
 MIT
